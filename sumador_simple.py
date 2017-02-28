@@ -3,7 +3,7 @@
 import socket
 
 mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-mySocket.bind(('localhost',1234))
+mySocket.bind(('localhost',1224))
 
 mySocket.listen(5)
 
@@ -16,27 +16,36 @@ while True:
 	request = recvSocket.recv(1024).decode('utf-8')
 	print(request)
 
-	sumando = (request.split())[1][1:]
-	try: 
-		if primer_sumando:
-			print("primer sumando:" + sumando)
-			sumando1 = int(sumando)
-			recvSocket.send(bytes("HTTP/1.1 200 OK \r\n\r\n" + 
-								"<html><body><h1>Primer sumando: " + sumando1 + "</h1></body></html>", 'utf-8'))
+	sumando = request.split()[1][1:]
 
-		else:
-			print("segundo sumando:" + sumando)
-			suma = sumando1 + sumando
-			print("suma :" + int(suma))
-			recvSocket.send(bytes("HTTP/1.1 200 OK \r\n\r\n" + 
-								"<html><body><h1>Resultado: " + int(suma) + "</h1></body></html>", 'utf-8'))
-		
-		primer_sumando = False
+	if sumando == "favicon.ico":
+		recvSocket.send(bytes("HTTP/1.1 404 Not Found OK \r\n\r\n", 'utf-8'))
+	try:
+		sumando = int(sumando)
 		
 	except:
-		if primer_sumando == "favicon.ico":
-			"None"
-	
+		print("sumando no valido")
+		recvSocket.close()
+		continue
+# Logica de negocio
 
-recvSocket.close()
+	if primer_sumando:
+		print("primer sumando:" + str(sumando))
+		sumando1 = sumando
+		recvSocket.send(bytes("HTTP/1.1 200 OK \r\n\r\n" + 
+							"<html><body><h1>Primer sumando: " + 
+							str(sumando1) + 
+							"</h1></body></html>", 'utf-8'))
+		primer_sumando = False
+	else:
+		#print("segundo sumando:" + str(sumando)
+		suma = sumando1 + sumando
+		print("suma :" + str(suma))
+		recvSocket.send(bytes("HTTP/1.1 200 OK \r\n\r\n" + 
+								"<html><body><h1>Resultado: " +
+								str(sumando1) + str(sumando) + "=" + 
+								str(suma) + 
+								"</h1></body></html>", 'utf-8'))
+
+		recvSocket.close()
 
